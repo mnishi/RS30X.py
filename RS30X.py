@@ -4,15 +4,15 @@ import array
 import struct
 import datetime
 
-TTY_SPEED = 115200
-TTY_TIMEOUT = 10
+TTL_SPEED = 115200
+TTL_TIMEOUT = 10
 
 class RS30XController:
     def __init__(self):
         self.dev = os.getenv('RS30X_SERIAL_DEVICE')
         self.ser = None
         if self.dev is not None:
-            self,ser = serial.Serial(self.dev, TTY_SPEED, TTY_TIMEOUT)
+            self,ser = serial.Serial(self.dev, TTL_SPEED, TTL_TIMEOUT)
 
     def __send(self, array_obj):
         if self.ser is not None:
