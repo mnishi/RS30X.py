@@ -9,20 +9,29 @@ id = 1
 
 con = RS30XController()
 
-con.initMemMap(id)
+con.init(id)
 
 con.move(id, 900)
-
 time.sleep(2)
+
+con.getStatus(id)
+print con.getPosition(id)
 
 con.move(id, -900)
-
 time.sleep(2)
+
+con.getStatus(id)
+print con.getPosition(id)
 
 con.move(id, 900, 500)
-
 time.sleep(2)
+
+con.getStatus(id)
+print con.getPosition(id)
 
 con.move(id, -1200, 1000)
-
 time.sleep(2)
+
+con.getStatus(id)
+print con.getPosition(id)
+
