@@ -8,7 +8,7 @@ SERIAL_BAUDRATE = 115200
 SERIAL_BYTESIZE = serial.EIGHTBITS
 SERIAL_PARITY   = serial.PARITY_NONE
 SERIAL_STOPBIT  = serial.STOPBITS_ONE
-REPLY_DELAY     = 18 # 100us + 18 * 50 us = 1ms
+REPLY_DELAY     = 38 # 100us + 38 * 50 us = 4ms
 
 class RS30XController:
     def __init__(self):
