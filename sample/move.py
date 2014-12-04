@@ -11,27 +11,14 @@ con = RS30XController()
 
 con.init(id)
 
-con.move(id, 900)
+con.move(id, 900, 0)
 time.sleep(2)
 
-con.getStatus(id)
-print con.getPosition(id)
-
-con.move(id, -900)
+con.move(id, -900, 0)
 time.sleep(2)
-
-con.getStatus(id)
-print con.getPosition(id)
 
 con.move(id, 900, 500)
-time.sleep(2)
-
-con.getStatus(id)
-print con.getPosition(id)
+time.sleep(5)
 
 con.move(id, -1200, 1000)
-time.sleep(2)
-
-con.getStatus(id)
-print con.getPosition(id)
-
+time.sleep(10)
