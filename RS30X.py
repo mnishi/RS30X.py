@@ -103,6 +103,6 @@ class RS30XController:
 
         array_obj.extend(array.array('B', [sum])) 
 
-    def log(self, message, values = []):
+    def log(self, message, *values):
         if self.logging == True:
             print "%s: %s" % (datetime.datetime.now(), message % values)
