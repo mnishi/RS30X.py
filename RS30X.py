@@ -69,7 +69,7 @@ class RS30XController:
             a.append(u[1])
 
         RS30XController.appendCheckSum(a)
-        self.log("move: %s", a)
+        self.log("move: id = %d, pos = %d, time = %d, packet = %s", id, pos, time, a)
         self.__send(a)
 
     def getStatus(self, id):
