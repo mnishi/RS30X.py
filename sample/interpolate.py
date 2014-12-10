@@ -12,7 +12,7 @@ CONTROL_PERIOD = 20.0 # msec
 #
 # functions
 #
-def interpolate(con, id, src, dest):
+def interpolate(con, ids, src, dest):
     reqcnt = getRequiredPeriods(src, dest)
     con.log("interpolate: src = %f, dest = %f, requiredPeriods = %d", src, dest, reqcnt) 
     
@@ -48,15 +48,17 @@ def getTrajectory(src, dest, period_, periodMax_):
 #
 # main code
 #
-id = 1
+ids = range(1,3)
 
 con = RS30XController()
-con.init(id)
+
 src = 0.0
-con.move(id, src, 1000)
+for id in ids:
+    con.torqueOn(id)
+    con.move(id, src, 1000)
 time.sleep(2)
-src = interpolate(con, id, src, 90.0)
-src = interpolate(con, id, src, -120.0)
-src = interpolate(con, id, src, 150.0)
+src = interpolate(con, ids[0], src, 90.0)
+src = interpolate(con, ids[0], src, -120.0)
+src = interpolate(con, ids[0], src, 150.0)
 
-
+con.torqueOff(id)
