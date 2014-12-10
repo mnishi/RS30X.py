@@ -24,17 +24,17 @@ def interpolate(con, id, src, dest):
 
     for i in range(reqcnt):
         if i < (reqcnt -1):
-            pos = convPosTo10deg(trajectory[i + 1])
+            pos = convPosToTenthDeg(trajectory[i + 1])
             con.move(id, pos, int(CONTROL_PERIOD)) 
             time.sleep(CONTROL_PERIOD / 1000.0)
         else:
-            pos = convPosTo10deg(trajectory[i])
+            pos = convPosToTenthDeg(trajectory[i])
             con.move(id, pos, int(CONTROL_PERIOD * 2))
             time.sleep(CONTROL_PERIOD / 500.0)
 
     return dest
 
-def convPosTo10deg(pos):
+def convPosToTenthDeg(pos):
     return int(round(pos * 10.0, 0))
 
 def getRequiredPeriods(src, dest):
@@ -53,10 +53,14 @@ id = 1
 con = RS30XController()
 con.init(id)
 src = 0.0
-con.move(id, src, 1000)
+con.move(id, src, 100)
 time.sleep(2)
+src = interpolate(con, id, src, 30.0)
+src = interpolate(con, id, src, -60.0)
 src = interpolate(con, id, src, 90.0)
 src = interpolate(con, id, src, -120.0)
 src = interpolate(con, id, src, 150.0)
-
-
+src = interpolate(con, id, src, -120.0)
+src = interpolate(con, id, src, 90.0)
+src = interpolate(con, id, src, -60.0)
+src = interpolate(con, id, src, 30.0)
