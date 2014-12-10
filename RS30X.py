@@ -3,6 +3,7 @@ import serial
 import array
 import struct
 import datetime
+import collections
 
 SERIAL_BAUDRATE = 115200
 SERIAL_BYTESIZE = serial.EIGHTBITS
@@ -81,12 +82,14 @@ class RS30XController:
         self.__send(a)
 
     def move(self, *args):
-        if isinstance(args[0], RS30XParameter):
-            self.__moveLong(*args)
+        if isinstance(args[0], collections.Iterable) or isinstance(args[0], tuple):
+            self.__moveLong(args[0])
+        elif isinstance(args[0], RS30XParameter):
+            self.__moveLong(args)
         else:
             self.__moveShort(*args)
     
-    def __moveLong(self, *args):
+    def __moveLong(self, args):
         datlen = 3
         if args[0].time != -1:
             datlen = 5
