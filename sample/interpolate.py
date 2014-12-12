@@ -58,7 +58,7 @@ def getTrajectory(src, dest, period_, periodMax_):
 #
 # main code
 #
-ids = range(1,3)
+ids = range(1,7)
 
 con = RS30XController()
 
@@ -66,9 +66,11 @@ src = 0.0
 
 for id in ids:
     con.torqueOn(id)
-    con.move(id, src, 100)
 
-time.sleep(2)
+for id in ids:
+    con.move(id, src, 50)
+
+time.sleep(3)
 
 src = interpolate(con, ids, src, 30.0)
 src = interpolate(con, ids, src, -60.0)
@@ -77,8 +79,6 @@ src = interpolate(con, ids, src, -120.0)
 src = interpolate(con, ids, src, 150.0)
 src = interpolate(con, ids, src, -120.0)
 src = interpolate(con, ids, src, 90.0)
-src = interpolate(con, ids, src, -60.0)
-src = interpolate(con, ids, src, 30.0)
 
 for id in ids:
     con.torqueOff(id)
