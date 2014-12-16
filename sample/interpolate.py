@@ -26,11 +26,11 @@ def interpolate(con, ids, src, dest):
     for i in range(reqcnt):
         if i < (reqcnt -1):
             pos = convPosToTenthDeg(trajectory[i + 1])
-            con.move(createTargetParams(ids, pos, int(CONTROL_PERIOD))) 
+            con.move(createTargetParams(ids, pos, int(CONTROL_PERIOD * 2))) 
             time.sleep(CONTROL_PERIOD / 1000.0)
         else:
             pos = convPosToTenthDeg(trajectory[i])
-            con.move(createTargetParams(ids, pos, int(CONTROL_PERIOD * 2))) 
+            con.move(createTargetParams(ids, pos, int(CONTROL_PERIOD))) 
             time.sleep(CONTROL_PERIOD / 500.0)
 
     return dest
