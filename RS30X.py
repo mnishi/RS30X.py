@@ -4,12 +4,37 @@ import array
 import struct
 import datetime
 import collections
+import enum 
+import inspect
 
 SERIAL_BAUDRATE = 115200
 SERIAL_BYTESIZE = serial.EIGHTBITS
 SERIAL_PARITY   = serial.PARITY_NONE
 SERIAL_STOPBIT  = serial.STOPBITS_ONE
 SERIAL_TIMEOUT  = 1
+
+class Logger:
+    logging = True
+    ELogLevel = enum.Enum("ELogLevel", "ERROR WARN_ INFO_ DEBUG TRACE")
+
+    @classmethod
+    def get_line(cls, depth=0):
+        frame = inspect.currentframe(depth + 1)
+        filename = frame.f_code.co_filename
+        if filename.find('/') >= 0:
+            filename = filename.rsplit('/', 1)[1]
+        return (filename, frame.f_lineno)
+
+    @classmethod
+    def log(cls, level, message, *values):
+        if cls.logging:
+            line = cls.get_line(1)
+            print "%s:[%s]:%s:%d: %s" % (datetime.datetime.now(), level.name, line[0], line[1], message % values)
+
+    @classmethod
+    def logging(cls, logging = True):
+        cls.logging = logging
+
 
 class RS30XParameter:
     def __init__(self, id, pos = 0, time = -1):
@@ -18,8 +43,7 @@ class RS30XParameter:
         self.time = int(time)
 
 class RS30XController:
-    def __init__(self, logging = True):
-        self.logging = logging
+    def __init__(self):
         self.dev = os.getenv('RS30X_SERIAL_DEVICE')
         self.ser = None
         self.status = {}
@@ -36,49 +60,49 @@ class RS30XController:
         a = RS30XController.createShortPacketHeader(id)
         a.extend(array.array('B', [0x10, 0xFF, 0xFF, 0x00]))
         RS30XController.appendCheckSum(a)
-        self.log("initMemMap: %s", a)
+        Logger.log(Logger.ELogLevel.TRACE, "initMemMap, %s", a)
         self.__send(a)
 
     def setReplyDelay(self, id, delay):
         a = RS30XController.createShortPacketHeader(id)
         a.extend(array.array('B', [0x60, 0x07, 0x01, 0x01, delay]))
         RS30XController.appendCheckSum(a)
-        self.log("setReplyDelay: %s", a)
+        Logger.log(Logger.ELogLevel.TRACE, "setReplyDelay, %s", a)
         self.__send(a)
 
     def setServoId(self, id, dest):
         a = RS30XController.createShortPacketHeader(id)
         a.extend(array.array('B', [0x00, 0x04, 0x01, 0x01, dest]))
         RS30XController.appendCheckSum(a)
-        self.log("setServoId: %s", a)
+        Logger.log(Logger.ELogLevel.TRACE, "setServoId, %s", a)
         self.__send(a)
 
     def commitToFlashROM(self, id):
         a = RS30XController.createShortPacketHeader(id)
         a.extend(array.array('B', [0x40,0xFF,0x00,0x00]))
         RS30XController.appendCheckSum(a)
-        self.log("commitToFlashROM: %s", a)
+        Logger.log(Logger.ELogLevel.TRACE, "commitToFlashROM, %s", a)
         self.__send(a)
 
     def restart(self, id):
         a = RS30XController.createShortPacketHeader(id)
         a.extend(array.array('B', [0x20,0xFF,0x00,0x00]))
         RS30XController.appendCheckSum(a)
-        self.log("restart: %s", a)
+        Logger.log(Logger.ELogLevel.TRACE, "restart, %s", a)
         self.__send(a)
 
     def torqueOn(self, id):
         a = RS30XController.createShortPacketHeader(id)
         a.extend(array.array('B', [0x00, 0x24, 0x01, 0x01, 0x01]))
         RS30XController.appendCheckSum(a)
-        self.log("torqueOn: %s", a)
+        Logger.log(Logger.ELogLevel.TRACE, "torqueOn, %s", a)
         self.__send(a)
 
     def torqueOff(self, id):
         a = RS30XController.createShortPacketHeader(id)
         a.extend(array.array('B', [0x00, 0x24, 0x01, 0x01, 0x00]))
         RS30XController.appendCheckSum(a)
-        self.log("torqueOff: %s", a)
+        Logger.log(Logger.ELogLevel.TRACE, "torqueOff, %s", a)
         self.__send(a)
 
     def move(self, *args):
@@ -98,7 +122,7 @@ class RS30XController:
         a.extend(array.array('B', [0x1E, datlen, len(args)]))
 
         for arg in args:
-            self.log("__moveLong: id = %d, pos = %d, time = %d", arg.id, arg.pos, arg.time)
+            Logger.log(Logger.ELogLevel.TRACE, "__moveLong, id = %d, pos = %d, time = %d", arg.id, arg.pos, arg.time)
             
             a.append(arg.id)
             p = struct.pack('<h', arg.pos)
@@ -113,7 +137,7 @@ class RS30XController:
                 a.append(u[1])
 
         RS30XController.appendCheckSum(a)
-        self.log("__moveLong: packet = %s", a)
+        Logger.log(Logger.ELogLevel.TRACE, "__moveLong, packet = %s", a)
         self.__send(a)
 
     def __moveShort(self, id_, pos_, time_ = -1):
@@ -139,23 +163,23 @@ class RS30XController:
             a.append(u[1])
 
         RS30XController.appendCheckSum(a)
-        self.log("__moveShort: id = %d, pos = %d, time = %d, packet = %s", id, pos, time, a)
+        Logger.log(Logger.ELogLevel.TRACE, "__moveShort, id = %d, pos = %d, time = %d, packet = %s", id, pos, time, a)
         self.__send(a)
 
     def getStatus(self, id):
         a = RS30XController.createShortPacketHeader(id)
         a.extend(array.array('B', [0x09, 0x00, 0x00, 0x01]))
         RS30XController.appendCheckSum(a)
-        self.log("getStatus: %s", a)
+        Logger.log(Logger.ELogLevel.TRACE, "getStatus, %s", a)
         self.__send(a)
         
         p = None
         if self.ser is not None:
-            self.log("getStatus: reading...")
+            Logger.log(Logger.ELogLevel.TRACE, "getStatus, reading...")
             p = self.ser.read(26)
         else:
             p = "\x00\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f\x10\x11\x12\x13\x14\x15\x16\x17\x18\x19\x1a"
-        self.log("getStatusReply: %s", array.array('B', p))        
+        Logger.log(Logger.ELogLevel.TRACE, "getStatusReply, %s", array.array('B', p))        
         self.status[id] = p[7:25]
 
     def getPosition(self, id):
@@ -176,7 +200,3 @@ class RS30XController:
             sum = sum ^ array_obj[i]
 
         array_obj.extend(array.array('B', [sum])) 
-
-    def log(self, message, *values):
-        if self.logging == True:
-            print "%s: %s" % (datetime.datetime.now(), message % values)

@@ -6,6 +6,7 @@ import math
 sys.path.append(os.pardir)
 from RS30X import RS30XController
 from RS30X import RS30XParameter
+from RS30X import Logger
 
 SPEED_MAX = 240.0 / 1000.0 # deg per msec
 CONTROL_PERIOD = 20.0 # msec
@@ -15,12 +16,12 @@ CONTROL_PERIOD = 20.0 # msec
 #
 def interpolate(con, ids, src, dest):
     reqcnt = getRequiredPeriods(src, dest)
-    con.log("interpolate: src = %f, dest = %f, requiredPeriods = %d", src, dest, reqcnt) 
+    Logger.log(Logger.ELogLevel.TRACE, "interpolate, src = %f, dest = %f, requiredPeriods = %d", src, dest, reqcnt) 
     
     trajectory = []
     for i in range(1, reqcnt + 1, 1):
         pos = getTrajectory(src, dest, i, reqcnt) 
-        con.log("interpolate: src = %f, dest = %f, period = %d, periodMax = %d, pos = %f", src, dest, i, reqcnt, pos)
+        Logger.log(Logger.ELogLevel.TRACE, "interpolate, src = %f, dest = %f, period = %d, periodMax = %d, pos = %f", src, dest, i, reqcnt, pos)
         trajectory.append(pos)
 
     for i in range(reqcnt):
