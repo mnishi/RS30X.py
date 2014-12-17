@@ -16,6 +16,7 @@ SERIAL_TIMEOUT  = 1
 class Logger:
     logging = True
     ELogLevel = enum.Enum("ELogLevel", "ERROR WARN_ INFO_ DEBUG TRACE")
+    level = ELogLevel.INFO_
 
     @classmethod
     def get_line(cls, depth=0):
@@ -27,7 +28,7 @@ class Logger:
 
     @classmethod
     def log(cls, level, message, *values):
-        if cls.logging:
+        if cls.logging and cls.level.value >= level.value:
             line = cls.get_line(1)
             print "%s:[%s]:%s:%d: %s" % (datetime.datetime.now(), level.name, line[0], line[1], message % values)
 
