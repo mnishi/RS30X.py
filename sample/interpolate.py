@@ -59,6 +59,7 @@ def getTrajectory(src, dest, period_, periodMax_):
 #
 # main code
 #
+Logger.level = Logger.ELogLevel.TRACE
 ids = range(1,7)
 
 con = RS30XController()
@@ -69,7 +70,7 @@ for id in ids:
     con.torqueOn(id)
 
 for id in ids:
-    con.move(id, src, 50)
+    con.move(id, src, 0)
 
 time.sleep(3)
 
@@ -80,6 +81,11 @@ src = interpolate(con, ids, src, -120.0)
 src = interpolate(con, ids, src, 150.0)
 src = interpolate(con, ids, src, -120.0)
 src = interpolate(con, ids, src, 90.0)
+src = interpolate(con, ids, src, -60.0)
+src = interpolate(con, ids, src, 30.0)
+src = interpolate(con, ids, src, 0.0)
+
+time.sleep(1)
 
 for id in ids:
     con.torqueOff(id)
